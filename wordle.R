@@ -13,8 +13,8 @@ words <- tolower(d[,1])
 
 # words <- gsub("(.)|( )|([1-9])", "", words)
 
-mysubset <- function(d, length = 5, notin = NULL, contains = NULL, known = NULL, pos = NULL, bestWord = FALSE){
-  words <- d[nchar(d) == length]
+mysubset <- function(d, size = 5, notin = NULL, contains = NULL, known = NULL, pos = NULL, bestWord = FALSE){
+  words <- d[nchar(d) == size]
   words <- d <- words[!unlist(if(length(words) != 0) lapply(strsplit(words, ""), function(i) any(i %in% c("-", " ", "/", ".") )) else character(0))]
   if(!is.null(notin) & !is.null(contains)) notin <- paste(setdiff(strsplit(notin, "")[[1]], strsplit(contains, "")[[1]]), collapse = "")
   if(!is.null(notin)){
@@ -49,7 +49,7 @@ mysubset <- function(d, length = 5, notin = NULL, contains = NULL, known = NULL,
       howmany[i] <- checkword(words[i], words)
     }
     most <- which(howmany == max(howmany))
-    test <- if(length(most) != 0) lapply(strsplit(words[most], ""), function(i) length(unique(i))) == length else F
+    test <- if(length(most) != 0) lapply(strsplit(words[most], ""), function(i) length(unique(i))) == size else F
     
     # cat("Word:", ifelse(any(test == 1), words[match(1, test)], words[1]), "\n")
     if(any(test == 1)){
@@ -61,13 +61,13 @@ mysubset <- function(d, length = 5, notin = NULL, contains = NULL, known = NULL,
     # cat("Word:", ifelse(any(test == 1), words[most[which(test == 1)]], words[most]), "\n")
   }
   if(!is.null(known) && !identical(known, "")){
-    if(length(unique(pos[known == 1])) == (length - 1) & length(words) >= 3){
+    if(length(unique(pos[known == 1])) == (size - 1) & length(words) >= 3){
       subwords <- strsplit(words, "")
       tmp <- rep(NA, length(words))
-      for(i in 1:length(words)) tmp[i] <- subwords[[i]][!((1:length) %in% pos[known == 1])]
+      for(i in 1:length(words)) tmp[i] <- subwords[[i]][!((1:size) %in% pos[known == 1])]
       dsub <- d[!(d %in% words)]
       
-      for(i in 1:(length-1)){
+      for(i in 1:(size-1)){
         position <- unique(pos[known == 1])[i]
         dsub <- dsub[substr(dsub, position, position) != unique(substr(words, position, position))]
       }
@@ -77,7 +77,7 @@ mysubset <- function(d, length = 5, notin = NULL, contains = NULL, known = NULL,
         howmany[i] <- checkword(dsub[i], tmp)
       }
       most <- which(howmany == max(howmany))
-      test <- if(length(most) != 0) lapply(strsplit(dsub[most], ""), function(i) length(unique(i))) == length else F
+      test <- if(length(most) != 0) lapply(strsplit(dsub[most], ""), function(i) length(unique(i))) == size else F
       
       # cat("Word:", ifelse(any(test == 1), words[match(1, test)], words[1]), "\n")
       if(any(test == 1)){
@@ -98,7 +98,7 @@ mysubset <- function(d, length = 5, notin = NULL, contains = NULL, known = NULL,
     contains <- paste(c(contains, containsAdd), collapse = "")
     known <- paste(c(known, knownAdd), collapse = "")
     pos <- paste(c(pos, posAdd), collapse = "")
-    mysubset(words, length = length, notin = notin, contains = contains, known = known, pos = pos, bestWord = TRUE)
+    mysubset(words, size = size, notin = notin, contains = contains, known = known, pos = pos, bestWord = TRUE)
   }
   else{
     cat("You're welcome!")
@@ -112,7 +112,7 @@ checkword <- function(word, dictionary){
   sum(grepl(word, dictionary))
 }
 
-mysubset(words, length = 5, bestWord = TRUE)
+mysubset(words, size = 5, bestWord = TRUE)
 
 
 
