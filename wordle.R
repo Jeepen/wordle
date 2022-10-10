@@ -53,21 +53,23 @@ mysubset <- function(d, size = 5, notin = NULL, contains = NULL, known = NULL, p
     
     # cat("Word:", ifelse(any(test == 1), words[match(1, test)], words[1]), "\n")
     if(any(test == 1)){
-      cat("Words:", sample(words[most[which(test == 1)]], 1), "\n")
+      cat("Word from dictionary:", sample(words[most[which(test == 1)]], 1), "\n")
     }
     else{
-      cat("Words:", sample(words[most], 1), "\n")
+      cat("Word from dictionary:", sample(words[most], 1), "\n")
     }
     # cat("Word:", ifelse(any(test == 1), words[most[which(test == 1)]], words[most]), "\n")
   }
   if(!is.null(known) && !identical(known, "")){
-    if(length(unique(pos[known == 1])) == (size - 1) & length(words) >= 3){     # If all but one are known, and more than three words are left
+    # if(length(unique(pos[known == 1])) == (size - 1) & length(words) >= 3){     # If all but one are known, and more than three words are left
+    if(length(words) < 100){
       subwords <- strsplit(words, "")                                           # Split letters
-      tmp <- rep(NA, length(words))                                             # Take letters from dictionary where we don't know the true letter
-      for(i in 1:length(words)) tmp[i] <- subwords[[i]][!((1:size) %in% pos[known == 1])]
+      # tmp <- rep(NA, length(words))                                             # Take letters from dictionary where we don't know the true letter
+      tmp <- list()
+      for(i in 1:length(words)) tmp[[i]] <- subwords[[i]][!((1:size) %in% pos[known == 1])]
       dsub <- d[!(d %in% words)]                                                # Dictionary words that are not remaining                                     
       
-      for(i in 1:(size-1)){
+      for(i in 1:length(unique(pos[known == 1]))){
         position <- unique(pos[known == 1])[i]                                  # Take the i'th position we know
         # Take the words in dsub where the i'th letter is not the i'th known letter
         dsub <- dsub[substr(dsub, position, position) != unique(substr(words, position, position))]
@@ -84,12 +86,12 @@ mysubset <- function(d, size = 5, notin = NULL, contains = NULL, known = NULL, p
       
       # cat("Word:", ifelse(any(test == 1), words[match(1, test)], words[1]), "\n")
       if(any(test == 1)){
-        cat("Words:", sample(dsub[most[which(test == 1)]], 1), "\n")
+        cat("Optimal word:", sample(dsub[most[which(test == 1)]], 1), "\n")
       }
       else{
-        cat("Words:", sample(dsub[most],1), "\n")
+        cat("Optimal word:", sample(dsub[most],1), "\n")
       }
-    } 
+    }
   }
   correct <- readline(prompt = "Correct? ")
   if(!as.logical(correct)){
