@@ -61,22 +61,25 @@ mysubset <- function(d, size = 5, notin = NULL, contains = NULL, known = NULL, p
     # cat("Word:", ifelse(any(test == 1), words[most[which(test == 1)]], words[most]), "\n")
   }
   if(!is.null(known) && !identical(known, "")){
-    if(length(unique(pos[known == 1])) == (size - 1) & length(words) >= 3){
-      subwords <- strsplit(words, "")
-      tmp <- rep(NA, length(words))
+    if(length(unique(pos[known == 1])) == (size - 1) & length(words) >= 3){     # If all but one are known, and more than three words are left
+      subwords <- strsplit(words, "")                                           # Split letters
+      tmp <- rep(NA, length(words))                                             # Take letters from dictionary where we don't know the true letter
       for(i in 1:length(words)) tmp[i] <- subwords[[i]][!((1:size) %in% pos[known == 1])]
-      dsub <- d[!(d %in% words)]
+      dsub <- d[!(d %in% words)]                                                # Dictionary words that are not remaining                                     
       
       for(i in 1:(size-1)){
-        position <- unique(pos[known == 1])[i]
+        position <- unique(pos[known == 1])[i]                                  # Take the i'th position we know
+        # Take the words in dsub where the i'th letter is not the i'th known letter
         dsub <- dsub[substr(dsub, position, position) != unique(substr(words, position, position))]
       }
+      dsub <- dsub[nchar(dsub) > 0]
       
       howmany <- rep(NA, length(dsub))
       for(i in 1:length(dsub)){
-        howmany[i] <- checkword(dsub[i], tmp)
+        howmany[i] <- checkword(dsub[i], tmp)                                   # How many words have letters similar to word i in dsub
       }
-      most <- which(howmany == max(howmany))
+      most <- which(howmany == max(howmany))                                    # Which hits most?
+      # Take dsub with the right length
       test <- if(length(most) != 0) lapply(strsplit(dsub[most], ""), function(i) length(unique(i))) == size else F
       
       # cat("Word:", ifelse(any(test == 1), words[match(1, test)], words[1]), "\n")
@@ -98,7 +101,7 @@ mysubset <- function(d, size = 5, notin = NULL, contains = NULL, known = NULL, p
     contains <- paste(c(contains, containsAdd), collapse = "")
     known <- paste(c(known, knownAdd), collapse = "")
     pos <- paste(c(pos, posAdd), collapse = "")
-    mysubset(words, size = size, notin = notin, contains = contains, known = known, pos = pos, bestWord = TRUE)
+    mysubset(d, size = size, notin = notin, contains = contains, known = known, pos = pos, bestWord = TRUE)
   }
   else{
     cat("You're welcome!")
@@ -112,7 +115,4 @@ checkword <- function(word, dictionary){
   sum(grepl(word, dictionary))
 }
 
-mysubset(words, size = 5, bestWord = TRUE)
-
-
-
+mysubset(words, size = 5, bestWord = FALSE)
